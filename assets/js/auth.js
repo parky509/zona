@@ -86,11 +86,6 @@
                     return;
                 }
                 
-                if (password.length < 6) {
-                    showNotification('Password must be at least 6 characters.', 'error');
-                    return;
-                }
-                
                 submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating account...');
                 
                 const data = {

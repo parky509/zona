@@ -264,7 +264,7 @@ $stats = $user_data['stats'];
                                 <label class="text-white"><i class="fas fa-key"></i> New Password</label>
                                 <div class="input-with-icon">
                                     <i class="fas fa-key input-icon"></i>
-                                    <input type="password" name="new_password" class="form-control form-control-icon" required minlength="6">
+                                    <input type="password" name="new_password" class="form-control form-control-icon" required>
                                 </div>
                             </div>
                             

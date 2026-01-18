@@ -68,7 +68,7 @@ if (!defined('ABSPATH')) exit;
                 <div class="form-group">
                     <label for="reg_password" class="text-white"><i class="fas fa-lock"></i> Password</label>
                     <div style="position: relative;">
-                        <input type="password" name="password" id="reg_password" class="form-control" placeholder="Create a password (min. 6 characters)" required minlength="6" autocomplete="new-password" style="padding-right: 45px;">
+                        <input type="password" name="password" id="reg_password" class="form-control" placeholder="Create a password" required autocomplete="new-password" style="padding-right: 45px;">
                         <button type="button" class="password-toggle-btn" data-target="reg_password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #8b5cf6; padding: 5px; z-index: 2; font-size: 1.1rem;">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -188,11 +188,6 @@ jQuery(document).ready(function($) {
         }
         if (!password) {
             showNotification('Please enter a password.', 'error');
-            $('#reg_password').focus();
-            return false;
-        }
-        if (password.length < 6) {
-            showNotification('Password must be at least 6 characters.', 'error');
             $('#reg_password').focus();
             return false;
         }

@@ -374,11 +374,6 @@ class ZonaTech_User_Auth {
             exit;
         }
         
-        if (strlen($password) < 6) {
-            echo wp_json_encode(array('success' => false, 'data' => array('message' => 'Password must be at least 6 characters.')));
-            exit;
-        }
-        
         if ($password !== $confirm_password) {
             echo wp_json_encode(array('success' => false, 'data' => array('message' => 'Passwords do not match.')));
             exit;
@@ -933,11 +928,6 @@ class ZonaTech_User_Auth {
         
         if (!wp_check_password($current_password, $user->user_pass, $user_id)) {
             wp_send_json_error(array('message' => 'Current password is incorrect.'));
-            return;
-        }
-        
-        if (strlen($new_password) < 6) {
-            wp_send_json_error(array('message' => 'New password must be at least 6 characters.'));
             return;
         }
         
