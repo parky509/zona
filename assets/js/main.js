@@ -168,6 +168,22 @@
                     }, duration);
                 },
                 
+                success: function(message, duration = 4000) {
+                    this.show(message, 'success', duration);
+                },
+                
+                error: function(message, duration = 4000) {
+                    this.show(message, 'error', duration);
+                },
+                
+                warning: function(message, duration = 4000) {
+                    this.show(message, 'warning', duration);
+                },
+                
+                info: function(message, duration = 4000) {
+                    this.show(message, 'info', duration);
+                },
+                
                 getIcon: function(type) {
                     const icons = {
                         success: 'fa-check-circle',
