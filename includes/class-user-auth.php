@@ -781,8 +781,8 @@ class ZonaTech_User_Auth {
             return;
         }
         
-        $email = sanitize_email(wp_unslash($_POST['email'] ?? ''));
-        $password = wp_unslash($_POST['password'] ?? '');
+        $email = sanitize_email($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
         $remember = isset($_POST['remember']) && $_POST['remember'] === 'true';
         
         if (empty($email) || empty($password)) {
@@ -852,7 +852,7 @@ class ZonaTech_User_Auth {
             return;
         }
         
-        $email = sanitize_email(wp_unslash($_POST['email'] ?? ''));
+        $email = sanitize_email($_POST['email'] ?? '');
         
         if (empty($email)) {
             wp_send_json_error(array('message' => 'Email address is required.'));
