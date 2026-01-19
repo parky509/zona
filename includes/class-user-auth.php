@@ -782,7 +782,7 @@ class ZonaTech_User_Auth {
         }
         
         $email = sanitize_email(wp_unslash($_POST['email'] ?? ''));
-        $password = isset($_POST['password']) ? wp_unslash($_POST['password']) : '';
+        $password = wp_unslash($_POST['password'] ?? '');
         $remember = isset($_POST['remember']) && $_POST['remember'] === 'true';
         
         if (empty($email) || empty($password)) {
