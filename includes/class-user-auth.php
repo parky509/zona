@@ -51,7 +51,11 @@ class ZonaTech_User_Auth {
      * Handle avatar upload
      */
     public function handle_upload_avatar() {
-        check_ajax_referer('zonatech_nonce', 'nonce');
+        $nonce_value = isset($_POST['nonce']) ? sanitize_key(wp_unslash($_POST['nonce'])) : '';
+        if (!wp_verify_nonce($nonce_value, 'zonatech_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed. Please refresh the page and try again.'));
+            return;
+        }
         
         if (!is_user_logged_in()) {
             wp_send_json_error(array('message' => 'You must be logged in.'));
@@ -667,7 +671,11 @@ class ZonaTech_User_Auth {
     }
     
     public function handle_resend_verification() {
-        check_ajax_referer('zonatech_nonce', 'nonce');
+        $nonce_value = isset($_POST['nonce']) ? sanitize_key(wp_unslash($_POST['nonce'])) : '';
+        if (!wp_verify_nonce($nonce_value, 'zonatech_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed. Please refresh the page and try again.'));
+            return;
+        }
         
         $pending_user_id = intval($_POST['pending_user_id'] ?? 0);
         
