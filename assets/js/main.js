@@ -125,13 +125,7 @@
                 const $target = $(target);
                 return $target.is(allowedSelector) || $target.closest(allowedSelector).length;
             };
-            $(document).on('copy cut paste contextmenu', '.zonatech-container', function(e) {
-                if (isAllowedTarget(e.target)) {
-                    return;
-                }
-                e.preventDefault();
-            });
-            $(document).on('selectstart', '.zonatech-container', function(e) {
+            $(document).on('copy cut paste contextmenu selectstart', '.zonatech-container', function(e) {
                 if (isAllowedTarget(e.target)) {
                     return;
                 }
