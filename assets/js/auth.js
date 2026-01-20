@@ -167,29 +167,6 @@
                                 window.location.href = response.data.redirect;
                             }, 1000);
                         } else {
-                            const errorCode = response.data && response.data.code ? response.data.code : '';
-                            if (errorCode === 'nonce_invalid') {
-                                if (nonceRetry) {
-                                    form.removeData('nonce-retry');
-                                    showNotification(response.data.message, 'error');
-                                    submitBtn.prop('disabled', false).html(originalText);
-                                    return;
-                                }
-                                ZonaTechAuth.refreshNonce().done(function(result) {
-                                    if (result && result.data && result.data.nonce) {
-                                        zonatech_ajax.nonce = result.data.nonce;
-                                        form.data('nonce-retry', true);
-                                        form.trigger('submit');
-                                        return;
-                                    }
-                                    showNotification(response.data.message, 'error');
-                                    submitBtn.prop('disabled', false).html(originalText);
-                                }).fail(function() {
-                                    showNotification(response.data.message, 'error');
-                                    submitBtn.prop('disabled', false).html(originalText);
-                                });
-                                return;
-                            }
                             form.removeData('nonce-retry');
                             showNotification(response.data.message, 'error');
                             submitBtn.prop('disabled', false).html(originalText);
@@ -197,15 +174,39 @@
                     },
                     error: function(xhr) {
                         let errorMsg = 'An error occurred. Please try again.';
+                        let errorCode = '';
                         if (xhr.responseText) {
                             try {
                                 const response = JSON.parse(xhr.responseText);
                                 if (response && response.data && response.data.message) {
                                     errorMsg = response.data.message;
+                                    errorCode = response.data.code || '';
                                 }
                             } catch (parseError) {
-                                // ignore
+                                console.warn('Failed to parse error response:', parseError);
                             }
+                        }
+                        if (errorCode === 'nonce_invalid') {
+                            if (nonceRetry) {
+                                form.removeData('nonce-retry');
+                                showNotification(errorMsg, 'error');
+                                submitBtn.prop('disabled', false).html(originalText);
+                                return;
+                            }
+                            ZonaTechAuth.refreshNonce().done(function(result) {
+                                if (result && result.data && result.data.nonce) {
+                                    zonatech_ajax.nonce = result.data.nonce;
+                                    form.data('nonce-retry', true);
+                                    form.trigger('submit');
+                                    return;
+                                }
+                                showNotification(errorMsg, 'error');
+                                submitBtn.prop('disabled', false).html(originalText);
+                            }).fail(function() {
+                                showNotification(errorMsg, 'error');
+                                submitBtn.prop('disabled', false).html(originalText);
+                            });
+                            return;
                         }
                         form.removeData('nonce-retry');
                         showNotification(errorMsg, 'error');
