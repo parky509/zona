@@ -14,7 +14,7 @@ const PRECACHE_URLS = [
     '/zonatech-nin-service/'
 ];
 // Additional protected routes can be added here as needed (authenticated or sensitive pages).
-const PROTECTED_PATHS = ['/zonatech-dashboard/'];
+const PROTECTED_PATHS = new Set(['/zonatech-dashboard/']);
 
 // Install event
 self.addEventListener('install', (event) => {
@@ -58,8 +58,7 @@ self.addEventListener('fetch', (event) => {
     }
 
     const requestUrl = new URL(event.request.url);
-    const protectedPath = PROTECTED_PATHS.find((path) => requestUrl.pathname.startsWith(path));
-    if (protectedPath) {
+    if (PROTECTED_PATHS.has(requestUrl.pathname)) {
         event.respondWith(
             fetch(event.request).catch(() => {
                 if (event.request.mode === 'navigate') {
