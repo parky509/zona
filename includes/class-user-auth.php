@@ -8,6 +8,7 @@ if (!defined('ABSPATH')) {
 }
 
 class ZonaTech_User_Auth {
+    const NONCE_REFRESH_RATE_LIMIT = 10;
     
     private static $instance = null;
     
@@ -54,10 +55,7 @@ class ZonaTech_User_Auth {
      */
     public function handle_upload_avatar() {
         $nonce_value = isset($_POST['nonce']) ? sanitize_key(wp_unslash($_POST['nonce'])) : '';
-        if (!wp_verify_nonce($nonce_value, 'zonatech_nonce')) {
-            wp_send_json_error(array('message' => 'Security check failed. Please refresh the page and try again.'));
-            return;
-        }
+        $nonce_valid = wp_verify_nonce($nonce_value, 'zonatech_nonce');
         
         if (!is_user_logged_in()) {
             wp_send_json_error(array('message' => 'You must be logged in.'));
@@ -674,8 +672,12 @@ class ZonaTech_User_Auth {
     
     public function handle_resend_verification() {
         $nonce_value = isset($_POST['nonce']) ? sanitize_key(wp_unslash($_POST['nonce'])) : '';
-        if (!wp_verify_nonce($nonce_value, 'zonatech_nonce')) {
-            wp_send_json_error(array('message' => 'Security check failed. Please refresh the page and try again.'));
+        $nonce_valid = wp_verify_nonce($nonce_value, 'zonatech_nonce');
+        if (!$nonce_valid) {
+            wp_send_json_error(array(
+                'message' => 'Security check failed. Please refresh the page and try again.',
+                'code' => 'nonce_invalid'
+            ));
             return;
         }
         
@@ -785,7 +787,10 @@ class ZonaTech_User_Auth {
         
         $nonce_value = isset($_POST['nonce']) ? sanitize_key(wp_unslash($_POST['nonce'])) : '';
         if (!wp_verify_nonce($nonce_value, 'zonatech_nonce')) {
-            wp_send_json_error(array('message' => 'Security check failed. Please refresh the page and try again.'));
+            wp_send_json_error(array(
+                'message' => 'Security check failed. Please refresh the page and try again.',
+                'code' => 'nonce_invalid'
+            ));
             return;
         }
         
@@ -854,16 +859,19 @@ class ZonaTech_User_Auth {
     }
 
     public function handle_refresh_nonce() {
-        $ip_address = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : 'unknown';
+        $current_nonce = isset($_POST['current_nonce']) ? sanitize_key(wp_unslash($_POST['current_nonce'])) : '';
+        $current_nonce_valid = !empty($current_nonce) && wp_verify_nonce($current_nonce, 'zonatech_nonce');
+        $ip_address = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED_FOR'])) : (isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : 'unknown');
         $rate_limit_key = 'zonatech_nonce_refresh_' . md5($ip_address);
         if (get_transient($rate_limit_key)) {
             wp_send_json_error(array('message' => 'Please wait a moment before trying again.'));
             return;
         }
-        set_transient($rate_limit_key, 1, 10);
+        set_transient($rate_limit_key, 1, self::NONCE_REFRESH_RATE_LIMIT);
 
         wp_send_json_success(array(
-            'nonce' => wp_create_nonce('zonatech_nonce')
+            'nonce' => wp_create_nonce('zonatech_nonce'),
+            'nonce_valid' => $current_nonce_valid
         ));
     }
     

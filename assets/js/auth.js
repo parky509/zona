@@ -30,7 +30,7 @@
                 url: zonatech_ajax.ajax_url,
                 type: 'POST',
                 dataType: 'json',
-                data: { action: 'zonatech_refresh_nonce', nonce: zonatech_ajax.nonce }
+                data: { action: 'zonatech_refresh_nonce', current_nonce: zonatech_ajax.nonce }
             });
         },
         
@@ -80,7 +80,8 @@
                                 const response = JSON.parse(xhr.responseText);
                                 if (response && response.data && response.data.message) {
                                     errorMessage = response.data.message;
-                                    if (errorMessage.indexOf('Security check failed') !== -1) {
+                                    const errorCode = response.data.code || '';
+                                    if (errorCode === 'nonce_invalid') {
                                         if (nonceRetry) {
                                             form.removeData('nonce-retry');
                                             showNotification(errorMessage, 'error');
