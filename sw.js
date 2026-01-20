@@ -57,13 +57,18 @@ self.addEventListener('fetch', (event) => {
     }
 
     const requestUrl = new URL(event.request.url);
-    if (PROTECTED_PATHS.some((path) => requestUrl.pathname.startsWith(path))) {
+    const protectedPath = PROTECTED_PATHS.find((path) => requestUrl.pathname.startsWith(path));
+    if (protectedPath) {
         event.respondWith(
             fetch(event.request).catch(() => {
                 if (event.request.mode === 'navigate') {
                     return caches.match(OFFLINE_URL);
                 }
-                return new Response('', { status: 503, statusText: 'Service Unavailable' });
+                return new Response('Service unavailable while offline.', {
+                    status: 503,
+                    statusText: 'Service Unavailable',
+                    headers: { 'Content-Type': 'text/plain; charset=UTF-8' }
+                });
             })
         );
         return;
