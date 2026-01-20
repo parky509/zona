@@ -118,11 +118,12 @@
             });
         },
         
-        // Basic content protection to disable copy/select on content areas
+        // Basic client-side content protection (deterrent only). Use .zonatech-allow-copy to opt out.
         initContentProtection: function() {
+            const allowedSelector = 'input, textarea, select, button, .zonatech-allow-copy';
             $(document).on('copy cut contextmenu selectstart', function(e) {
                 const $target = $(e.target);
-                if ($target.is('input, textarea, select, button') || $target.closest('input, textarea, select, button, .zonatech-allow-copy').length) {
+                if ($target.is(allowedSelector) || $target.closest(allowedSelector).length) {
                     return true;
                 }
                 e.preventDefault();
