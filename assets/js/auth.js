@@ -48,6 +48,7 @@
                     url: zonatech_ajax.ajax_url,
                     type: 'POST',
                     data: data,
+                    dataType: 'json',
                     success: function(response) {
                         if (response.success) {
                             showNotification(response.data.message, 'success');
@@ -61,7 +62,18 @@
                     },
                     error: function(xhr, status, error) {
                         console.error('Login error:', status, error);
-                        showNotification('An error occurred. Please try again.', 'error');
+                        let errorMessage = 'An error occurred. Please try again.';
+                        if (xhr.responseText) {
+                            try {
+                                const response = JSON.parse(xhr.responseText);
+                                if (response && response.data && response.data.message) {
+                                    errorMessage = response.data.message;
+                                }
+                            } catch (parseError) {
+                                // Keep default message
+                            }
+                        }
+                        showNotification(errorMessage, 'error');
                         submitBtn.prop('disabled', false).html(originalText);
                     }
                 });

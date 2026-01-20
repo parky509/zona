@@ -770,9 +770,21 @@ class ZonaTech_User_Auth {
     }
     
     public function handle_login() {
+        if (defined('DOING_AJAX') && DOING_AJAX) {
+            while (ob_get_level() > 0 && ob_get_length() > 0) {
+                ob_end_clean();
+            }
+        }
+        
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=UTF-8');
+            header('Cache-Control: no-cache, no-store, must-revalidate');
+        }
+        
         $nonce_value = isset($_POST['nonce']) ? sanitize_key(wp_unslash($_POST['nonce'])) : '';
         if (!wp_verify_nonce($nonce_value, 'zonatech_nonce')) {
-            error_log('ZonaTech: Login nonce validation failed.');
+            wp_send_json_error(array('message' => 'Security check failed. Please refresh the page and try again.'));
+            return;
         }
         
         $email = sanitize_email($_POST['email'] ?? '');
