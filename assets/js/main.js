@@ -27,6 +27,7 @@
             this.initMobileMenu();
             this.initNotifications();
             this.initCalculator();
+            this.initContentProtection();
         },
         
         // Scroll Progress Bar - OPTIMIZED with throttle
@@ -114,6 +115,18 @@
                 
                 tabGroup.find('.tab-content').removeClass('active');
                 tabGroup.find('#' + tabId).addClass('active');
+            });
+        },
+        
+        // Basic content protection to disable copy/select on content areas
+        initContentProtection: function() {
+            $(document).on('copy cut contextmenu selectstart', function(e) {
+                const $target = $(e.target);
+                if ($target.is('input, textarea, select, button') || $target.closest('input, textarea, select, button, .zonatech-allow-copy').length) {
+                    return true;
+                }
+                e.preventDefault();
+                return false;
             });
         },
         
