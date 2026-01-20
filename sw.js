@@ -67,8 +67,8 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    const requestUrl = new URL(event.request.url);
-    if (PROTECTED_PATHS.has(requestUrl.pathname)) {
+    const requestPath = new URL(event.request.url).pathname;
+    if (PROTECTED_PATHS.has(requestPath)) {
         event.respondWith(handleProtectedFetch(event.request, event.request.mode));
         return;
     }
