@@ -43,7 +43,6 @@
                 const submitBtn = form.find('button[type="submit"]');
                 const originalText = submitBtn.html();
                 const nonceRetry = form.data('nonce-retry') === true;
-                const nonceRetry = form.data('nonce-retry') === true;
                 
                 submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Logging in...');
                 
@@ -132,6 +131,7 @@
                 const form = $(this);
                 const submitBtn = form.find('button[type="submit"]');
                 const originalText = submitBtn.html();
+                const nonceRetry = form.data('nonce-retry') === true;
                 
                 // Basic validation
                 const password = form.find('[name="password"]').val();
