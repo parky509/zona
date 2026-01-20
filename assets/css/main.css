@@ -92,14 +92,18 @@ html, body {
 }
 
 /* Disable text selection to reduce copy/paste on public pages */
-html, body {
+.zonatech-container {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
-input, textarea, select, button, .zonatech-allow-copy {
+.zonatech-container input,
+.zonatech-container textarea,
+.zonatech-container select,
+.zonatech-container button,
+.zonatech-container .zonatech-allow-copy {
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
