@@ -13,7 +13,7 @@ const PRECACHE_URLS = [
     '/zonatech-scratch-cards/',
     '/zonatech-nin-service/'
 ];
-// Additional protected routes can be added here as needed.
+// Additional protected routes can be added here as needed (authenticated or sensitive pages).
 const PROTECTED_PATHS = ['/zonatech-dashboard/'];
 
 // Install event
@@ -65,7 +65,7 @@ self.addEventListener('fetch', (event) => {
                 if (event.request.mode === 'navigate') {
                     return caches.match(OFFLINE_URL);
                 }
-                return new Response('Service unavailable while offline.', {
+                return new Response('This page requires an internet connection. Please check your connection and try again.', {
                     status: 503,
                     statusText: 'Service Unavailable',
                     headers: { 'Content-Type': 'text/plain; charset=UTF-8' }
