@@ -2,18 +2,18 @@
  * ZonaTech NG - Service Worker
  */
 
-const CACHE_NAME = 'zonatech-ng-v1';
+const CACHE_NAME = 'zonatech-ng-v2';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_URLS = [
     '/',
     '/zonatech-login/',
     '/zonatech-register/',
-    '/zonatech-dashboard/',
     '/zonatech-past-questions/',
     '/zonatech-scratch-cards/',
     '/zonatech-nin-service/'
 ];
+const PROTECTED_PATHS = ['/zonatech-dashboard/'];
 
 // Install event
 self.addEventListener('install', (event) => {
@@ -53,6 +53,12 @@ self.addEventListener('fetch', (event) => {
     
     // Skip admin-ajax requests
     if (event.request.url.includes('admin-ajax.php')) {
+        return;
+    }
+
+    const requestUrl = new URL(event.request.url);
+    if (PROTECTED_PATHS.some((path) => requestUrl.pathname.startsWith(path))) {
+        event.respondWith(fetch(event.request));
         return;
     }
     
