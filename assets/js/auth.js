@@ -112,7 +112,7 @@
                                     }
                                 }
                             } catch (parseError) {
-                                // Keep default message
+                                console.warn('Failed to parse error response:', parseError);
                             }
                         }
                         form.removeData('nonce-retry');
@@ -186,11 +186,14 @@
                                 console.warn('Failed to parse error response:', parseError);
                             }
                         }
+                        const handleRegisterError = () => {
+                            showNotification(errorMsg, 'error');
+                            submitBtn.prop('disabled', false).html(originalText);
+                        };
                         if (errorCode === 'nonce_invalid') {
                             if (nonceRetry) {
                                 form.removeData('nonce-retry');
-                                showNotification(errorMsg, 'error');
-                                submitBtn.prop('disabled', false).html(originalText);
+                                handleRegisterError();
                                 return;
                             }
                             ZonaTechAuth.refreshNonce().done(function(result) {
@@ -200,11 +203,9 @@
                                     form.trigger('submit');
                                     return;
                                 }
-                                showNotification(errorMsg, 'error');
-                                submitBtn.prop('disabled', false).html(originalText);
+                                handleRegisterError();
                             }).fail(function() {
-                                showNotification(errorMsg, 'error');
-                                submitBtn.prop('disabled', false).html(originalText);
+                                handleRegisterError();
                             });
                             return;
                         }
