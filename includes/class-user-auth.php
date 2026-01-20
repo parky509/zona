@@ -27,6 +27,8 @@ class ZonaTech_User_Auth {
         add_action('wp_ajax_zonatech_resend_verification', array($this, 'handle_resend_verification')); // Also for logged-in users
         add_action('wp_ajax_nopriv_zonatech_login', array($this, 'handle_login'));
         add_action('wp_ajax_zonatech_logout', array($this, 'handle_logout'));
+        add_action('wp_ajax_nopriv_zonatech_refresh_nonce', array($this, 'handle_refresh_nonce'));
+        add_action('wp_ajax_zonatech_refresh_nonce', array($this, 'handle_refresh_nonce'));
         add_action('wp_ajax_nopriv_zonatech_reset_password', array($this, 'handle_reset_password'));
         add_action('wp_ajax_zonatech_update_profile', array($this, 'handle_update_profile'));
         add_action('wp_ajax_zonatech_change_password', array($this, 'handle_change_password'));
@@ -848,6 +850,12 @@ class ZonaTech_User_Auth {
         wp_send_json_success(array(
             'message' => 'Logged out successfully.',
             'redirect' => home_url('/zonatech-login/')
+        ));
+    }
+
+    public function handle_refresh_nonce() {
+        wp_send_json_success(array(
+            'nonce' => wp_create_nonce('zonatech_nonce')
         ));
     }
     

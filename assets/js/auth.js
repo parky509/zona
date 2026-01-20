@@ -24,6 +24,15 @@
             this.initChangePasswordForm();
             this.initLogout();
         },
+
+        refreshNonce: function() {
+            return $.ajax({
+                url: zonatech_ajax.ajax_url,
+                type: 'POST',
+                dataType: 'json',
+                data: { action: 'zonatech_refresh_nonce' }
+            });
+        },
         
         // Login Form
         initLoginForm: function() {
@@ -68,6 +77,13 @@
                                 const response = JSON.parse(xhr.responseText);
                                 if (response && response.data && response.data.message) {
                                     errorMessage = response.data.message;
+                                    if (errorMessage.indexOf('Security check failed') !== -1) {
+                                        ZonaTechAuth.refreshNonce().done(function(result) {
+                                            if (result && result.data && result.data.nonce) {
+                                                zonatech_ajax.nonce = result.data.nonce;
+                                            }
+                                        });
+                                    }
                                 }
                             } catch (parseError) {
                                 // Keep default message
