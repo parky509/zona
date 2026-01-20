@@ -118,19 +118,21 @@
             });
         },
         
-        // Basic client-side content protection (deterrent only). Use .zonatech-allow-copy to opt out.
+        // Basic client-side content protection (deterrent only). Use .zonatech-allow-copy to allow copying.
         initContentProtection: function() {
             const allowedSelector = 'input, textarea, select, button, .zonatech-allow-copy';
+            const isAllowedTarget = (target) => {
+                const $target = $(target);
+                return $target.is(allowedSelector) || $target.closest(allowedSelector).length;
+            };
             $(document).on('copy cut paste contextmenu', '.zonatech-container', function(e) {
-                const $target = $(e.target);
-                if ($target.is(allowedSelector) || $target.closest(allowedSelector).length) {
+                if (isAllowedTarget(e.target)) {
                     return;
                 }
                 e.preventDefault();
             });
             $(document).on('selectstart', '.zonatech-container', function(e) {
-                const $target = $(e.target);
-                if ($target.is(allowedSelector) || $target.closest(allowedSelector).length) {
+                if (isAllowedTarget(e.target)) {
                     return;
                 }
                 e.preventDefault();
