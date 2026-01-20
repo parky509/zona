@@ -99,6 +99,11 @@
                                                 submitBtn.prop('disabled', false).html(originalText);
                                             }
                                         }).fail(function() {
+                                            const fallback = window.location && window.location.href ? window.location.href : '';
+                                            if (fallback) {
+                                                window.location.href = fallback;
+                                                return;
+                                            }
                                             form.removeData('nonce-retry');
                                             showNotification(errorMessage, 'error');
                                             submitBtn.prop('disabled', false).html(originalText);

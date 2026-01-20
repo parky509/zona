@@ -868,7 +868,7 @@ class ZonaTech_User_Auth {
     public function handle_refresh_nonce() {
         $current_nonce = isset($_POST['current_nonce']) ? sanitize_key(wp_unslash($_POST['current_nonce'])) : '';
         $current_nonce_valid = !empty($current_nonce) && wp_verify_nonce($current_nonce, 'zonatech_nonce');
-        if (!$current_nonce_valid) {
+        if (empty($current_nonce)) {
             wp_send_json_error(array(
                 'message' => 'Security check failed. Please refresh the page and try again.',
                 'code' => 'nonce_invalid'
