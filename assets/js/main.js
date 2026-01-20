@@ -123,14 +123,14 @@
             const allowedSelector = '.zonatech-allow-copy';
             const formControls = 'input, textarea, select, button';
             const isAllowedTarget = (target) => {
-                if (!target || target.nodeType !== 1) {
+                if (!target || target.nodeType !== Node.ELEMENT_NODE) {
                     return false;
                 }
                 return !!target.closest(allowedSelector);
             };
             const $containers = $('.zonatech-container');
             $containers.find(formControls).addClass('zonatech-allow-copy');
-            $containers.on('copy cut paste contextmenu selectstart', function(e) {
+            $(document).on('copy cut paste contextmenu selectstart', '.zonatech-container', function(e) {
                 if (isAllowedTarget(e.target)) {
                     return;
                 }
