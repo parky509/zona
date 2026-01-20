@@ -13,6 +13,7 @@ const PRECACHE_URLS = [
     '/zonatech-scratch-cards/',
     '/zonatech-nin-service/'
 ];
+// Additional protected routes can be added here as needed.
 const PROTECTED_PATHS = ['/zonatech-dashboard/'];
 
 // Install event
