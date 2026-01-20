@@ -121,12 +121,15 @@
         // Basic client-side content protection (deterrent only). Use .zonatech-allow-copy to allow copying.
         initContentProtection: function() {
             const allowedSelector = '.zonatech-allow-copy';
+            const formControls = 'input, textarea, select, button';
             const isAllowedTarget = (target) => {
-                const $target = $(target);
-                return $target.is(allowedSelector) || $target.closest(allowedSelector).length;
+                if (!target || target.nodeType !== 1) {
+                    return false;
+                }
+                return target.matches(allowedSelector) || !!target.closest(allowedSelector);
             };
             const $containers = $('.zonatech-container');
-            $containers.find('input, textarea, select, button').addClass('zonatech-allow-copy');
+            $containers.find(formControls).addClass('zonatech-allow-copy');
             $containers.on('copy cut paste contextmenu selectstart', function(e) {
                 if (isAllowedTarget(e.target)) {
                     return;
