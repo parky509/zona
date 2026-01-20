@@ -854,6 +854,12 @@ class ZonaTech_User_Auth {
     }
 
     public function handle_refresh_nonce() {
+        $nonce_value = isset($_POST['nonce']) ? sanitize_key(wp_unslash($_POST['nonce'])) : '';
+        if (!wp_verify_nonce($nonce_value, 'zonatech_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed. Please refresh the page and try again.'));
+            return;
+        }
+        
         wp_send_json_success(array(
             'nonce' => wp_create_nonce('zonatech_nonce')
         ));

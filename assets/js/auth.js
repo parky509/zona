@@ -30,7 +30,7 @@
                 url: zonatech_ajax.ajax_url,
                 type: 'POST',
                 dataType: 'json',
-                data: { action: 'zonatech_refresh_nonce' }
+                data: { action: 'zonatech_refresh_nonce', nonce: zonatech_ajax.nonce }
             });
         },
         
@@ -42,6 +42,7 @@
                 const form = $(this);
                 const submitBtn = form.find('button[type="submit"]');
                 const originalText = submitBtn.html();
+                const nonceRetry = form.data('nonce-retry') === true;
                 
                 submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Logging in...');
                 
@@ -60,11 +61,13 @@
                     dataType: 'json',
                     success: function(response) {
                         if (response.success) {
+                            form.removeData('nonce-retry');
                             showNotification(response.data.message, 'success');
                             setTimeout(function() {
                                 window.location.href = response.data.redirect;
                             }, 1000);
                         } else {
+                            form.removeData('nonce-retry');
                             showNotification(response.data.message || 'Login failed. Please try again.', 'error');
                             submitBtn.prop('disabled', false).html(originalText);
                         }
@@ -78,17 +81,27 @@
                                 if (response && response.data && response.data.message) {
                                     errorMessage = response.data.message;
                                     if (errorMessage.indexOf('Security check failed') !== -1) {
+                                        if (nonceRetry) {
+                                            form.removeData('nonce-retry');
+                                            showNotification(errorMessage, 'error');
+                                            submitBtn.prop('disabled', false).html(originalText);
+                                            return;
+                                        }
                                         ZonaTechAuth.refreshNonce().done(function(result) {
                                             if (result && result.data && result.data.nonce) {
                                                 zonatech_ajax.nonce = result.data.nonce;
+                                                form.data('nonce-retry', true);
+                                                form.trigger('submit');
                                             }
                                         });
+                                        return;
                                     }
                                 }
                             } catch (parseError) {
                                 // Keep default message
                             }
                         }
+                        form.removeData('nonce-retry');
                         showNotification(errorMessage, 'error');
                         submitBtn.prop('disabled', false).html(originalText);
                     }
