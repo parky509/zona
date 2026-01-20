@@ -126,7 +126,7 @@
                 if (!target || target.nodeType !== 1) {
                     return false;
                 }
-                return target.matches(allowedSelector) || !!target.closest(allowedSelector);
+                return !!target.closest(allowedSelector);
             };
             const $containers = $('.zonatech-container');
             $containers.find(formControls).addClass('zonatech-allow-copy');
