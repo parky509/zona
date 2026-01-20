@@ -58,7 +58,14 @@ self.addEventListener('fetch', (event) => {
 
     const requestUrl = new URL(event.request.url);
     if (PROTECTED_PATHS.some((path) => requestUrl.pathname.startsWith(path))) {
-        event.respondWith(fetch(event.request));
+        event.respondWith(
+            fetch(event.request).catch(() => {
+                if (event.request.mode === 'navigate') {
+                    return caches.match(OFFLINE_URL);
+                }
+                return new Response('', { status: 504, statusText: 'Gateway Timeout' });
+            })
+        );
         return;
     }
     
