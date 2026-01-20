@@ -15,6 +15,16 @@ const PRECACHE_URLS = [
 ];
 // Protected routes (authenticated/sensitive pages) bypass cache; offline access returns a short message.
 const PROTECTED_PATHS = new Set(['/zonatech-dashboard/']);
+const handleProtectedFetch = (request, requestMode) => fetch(request).catch(() => {
+    if (requestMode === 'navigate') {
+        return caches.match(OFFLINE_URL);
+    }
+    return new Response('Network required for authentication. Please check your connection.', {
+        status: 503,
+        statusText: 'Service Unavailable',
+        headers: { 'Content-Type': 'text/plain; charset=UTF-8' }
+    });
+});
 
 // Install event
 self.addEventListener('install', (event) => {
@@ -56,18 +66,7 @@ self.addEventListener('fetch', (event) => {
     if (event.request.url.includes('admin-ajax.php')) {
         return;
     }
-    const handleProtectedFetch = (request, requestMode) => fetch(request).catch(() => {
-        if (requestMode === 'navigate') {
-            return caches.match(OFFLINE_URL);
-        }
-        return new Response('Network required for authentication. Please check your connection.', {
-            status: 503,
-            statusText: 'Service Unavailable',
-            headers: { 'Content-Type': 'text/plain; charset=UTF-8' }
-        });
-    });
-
-    const requestPath = new URL(event.request.url).pathname;
+    const requestPath = event.request.url.slice(self.location.origin.length).split('?')[0];
     if (PROTECTED_PATHS.has(requestPath)) {
         event.respondWith(handleProtectedFetch(event.request, event.request.mode));
         return;
