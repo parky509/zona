@@ -92,7 +92,15 @@
                                                 zonatech_ajax.nonce = result.data.nonce;
                                                 form.data('nonce-retry', true);
                                                 form.trigger('submit');
+                                            } else {
+                                                form.removeData('nonce-retry');
+                                                showNotification(errorMessage, 'error');
+                                                submitBtn.prop('disabled', false).html(originalText);
                                             }
+                                        }).fail(function() {
+                                            form.removeData('nonce-retry');
+                                            showNotification(errorMessage, 'error');
+                                            submitBtn.prop('disabled', false).html(originalText);
                                         });
                                         return;
                                     }
