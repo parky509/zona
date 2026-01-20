@@ -13,7 +13,7 @@ const PRECACHE_URLS = [
     '/zonatech-scratch-cards/',
     '/zonatech-nin-service/'
 ];
-// Additional protected routes can be added here as needed (authenticated or sensitive pages).
+// Protected routes (authenticated/sensitive pages) bypass cache; offline access returns a short message.
 const PROTECTED_PATHS = new Set(['/zonatech-dashboard/']);
 
 // Install event
@@ -58,19 +58,18 @@ self.addEventListener('fetch', (event) => {
     }
 
     const requestUrl = new URL(event.request.url);
+    const handleProtectedFetch = () => fetch(event.request).catch(() => {
+        if (event.request.mode === 'navigate') {
+            return caches.match(OFFLINE_URL);
+        }
+        return new Response('Network required for authentication. Please check your connection.', {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: { 'Content-Type': 'text/plain; charset=UTF-8' }
+        });
+    });
     if (PROTECTED_PATHS.has(requestUrl.pathname)) {
-        event.respondWith(
-            fetch(event.request).catch(() => {
-                if (event.request.mode === 'navigate') {
-                    return caches.match(OFFLINE_URL);
-                }
-                return new Response('This protected page requires an internet connection to verify authentication. Please check your connection and try again.', {
-                    status: 503,
-                    statusText: 'Service Unavailable',
-                    headers: { 'Content-Type': 'text/plain; charset=UTF-8' }
-                });
-            })
-        );
+        event.respondWith(handleProtectedFetch());
         return;
     }
     
