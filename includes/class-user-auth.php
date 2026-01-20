@@ -56,6 +56,13 @@ class ZonaTech_User_Auth {
     public function handle_upload_avatar() {
         $nonce_value = isset($_POST['nonce']) ? sanitize_key(wp_unslash($_POST['nonce'])) : '';
         $nonce_valid = wp_verify_nonce($nonce_value, 'zonatech_nonce');
+        if (!$nonce_valid) {
+            wp_send_json_error(array(
+                'message' => 'Security check failed. Please refresh the page and try again.',
+                'code' => 'nonce_invalid'
+            ));
+            return;
+        }
         
         if (!is_user_logged_in()) {
             wp_send_json_error(array('message' => 'You must be logged in.'));
@@ -861,7 +868,14 @@ class ZonaTech_User_Auth {
     public function handle_refresh_nonce() {
         $current_nonce = isset($_POST['current_nonce']) ? sanitize_key(wp_unslash($_POST['current_nonce'])) : '';
         $current_nonce_valid = !empty($current_nonce) && wp_verify_nonce($current_nonce, 'zonatech_nonce');
-        $ip_address = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED_FOR'])) : (isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : 'unknown');
+        if (!$current_nonce_valid) {
+            wp_send_json_error(array(
+                'message' => 'Security check failed. Please refresh the page and try again.',
+                'code' => 'nonce_invalid'
+            ));
+            return;
+        }
+        $ip_address = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : 'unknown';
         $rate_limit_key = 'zonatech_nonce_refresh_' . md5($ip_address);
         if (get_transient($rate_limit_key)) {
             wp_send_json_error(array('message' => 'Please wait a moment before trying again.'));
