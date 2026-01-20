@@ -43,6 +43,7 @@
                 const submitBtn = form.find('button[type="submit"]');
                 const originalText = submitBtn.html();
                 const nonceRetry = form.data('nonce-retry') === true;
+                const nonceRetry = form.data('nonce-retry') === true;
                 
                 submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Logging in...');
                 
@@ -168,9 +169,16 @@
                         } else {
                             const errorCode = response.data && response.data.code ? response.data.code : '';
                             if (errorCode === 'nonce_invalid') {
+                                if (nonceRetry) {
+                                    form.removeData('nonce-retry');
+                                    showNotification(response.data.message, 'error');
+                                    submitBtn.prop('disabled', false).html(originalText);
+                                    return;
+                                }
                                 ZonaTechAuth.refreshNonce().done(function(result) {
                                     if (result && result.data && result.data.nonce) {
                                         zonatech_ajax.nonce = result.data.nonce;
+                                        form.data('nonce-retry', true);
                                         form.trigger('submit');
                                         return;
                                     }
@@ -182,8 +190,9 @@
                                 });
                                 return;
                             }
-                            showNotification(response.data.message, 'error');
-                            submitBtn.prop('disabled', false).html(originalText);
+                        form.removeData('nonce-retry');
+                        showNotification(response.data.message, 'error');
+                        submitBtn.prop('disabled', false).html(originalText);
                         }
                     },
                     error: function(xhr) {
@@ -198,6 +207,7 @@
                                 // ignore
                             }
                         }
+                        form.removeData('nonce-retry');
                         showNotification(errorMsg, 'error');
                         submitBtn.prop('disabled', false).html(originalText);
                     }
