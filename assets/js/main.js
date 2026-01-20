@@ -125,8 +125,9 @@
                 const $target = $(target);
                 return $target.is(allowedSelector) || $target.closest(allowedSelector).length;
             };
-            $('.zonatech-container').find('input, textarea, select, button').addClass('zonatech-allow-copy');
-            $(document).on('copy cut paste contextmenu selectstart', '.zonatech-container', function(e) {
+            const $containers = $('.zonatech-container');
+            $containers.find('input, textarea, select, button').addClass('zonatech-allow-copy');
+            $containers.on('copy cut paste contextmenu selectstart', function(e) {
                 if (isAllowedTarget(e.target)) {
                     return;
                 }
