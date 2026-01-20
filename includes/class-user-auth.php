@@ -341,7 +341,13 @@ class ZonaTech_User_Auth {
         }
         
         if (!$nonce_valid) {
-            echo wp_json_encode(array('success' => false, 'data' => array('message' => 'Security check failed. Please refresh the page and try again.')));
+            echo wp_json_encode(array(
+                'success' => false,
+                'data' => array(
+                    'message' => 'Security check failed. Please refresh the page and try again.',
+                    'code' => 'nonce_invalid'
+                )
+            ));
             exit;
         }
         

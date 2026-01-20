@@ -158,6 +158,7 @@
                     url: zonatech_ajax.ajax_url,
                     type: 'POST',
                     data: data,
+                    dataType: 'json',
                     success: function(response) {
                         if (response.success) {
                             showNotification(response.data.message, 'success');
@@ -165,12 +166,39 @@
                                 window.location.href = response.data.redirect;
                             }, 1000);
                         } else {
+                            const errorCode = response.data && response.data.code ? response.data.code : '';
+                            if (errorCode === 'nonce_invalid') {
+                                ZonaTechAuth.refreshNonce().done(function(result) {
+                                    if (result && result.data && result.data.nonce) {
+                                        zonatech_ajax.nonce = result.data.nonce;
+                                        form.trigger('submit');
+                                        return;
+                                    }
+                                    showNotification(response.data.message, 'error');
+                                    submitBtn.prop('disabled', false).html(originalText);
+                                }).fail(function() {
+                                    showNotification(response.data.message, 'error');
+                                    submitBtn.prop('disabled', false).html(originalText);
+                                });
+                                return;
+                            }
                             showNotification(response.data.message, 'error');
                             submitBtn.prop('disabled', false).html(originalText);
                         }
                     },
-                    error: function() {
-                        showNotification('An error occurred. Please try again.', 'error');
+                    error: function(xhr) {
+                        let errorMsg = 'An error occurred. Please try again.';
+                        if (xhr.responseText) {
+                            try {
+                                const response = JSON.parse(xhr.responseText);
+                                if (response && response.data && response.data.message) {
+                                    errorMsg = response.data.message;
+                                }
+                            } catch (parseError) {
+                                // ignore
+                            }
+                        }
+                        showNotification(errorMsg, 'error');
                         submitBtn.prop('disabled', false).html(originalText);
                     }
                 });
