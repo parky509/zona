@@ -121,13 +121,19 @@
         // Basic client-side content protection (deterrent only). Use .zonatech-allow-copy to opt out.
         initContentProtection: function() {
             const allowedSelector = 'input, textarea, select, button, .zonatech-allow-copy';
-            $(document).on('copy cut paste contextmenu selectstart', '.zonatech-container', function(e) {
+            $(document).on('copy cut paste contextmenu', '.zonatech-container', function(e) {
                 const $target = $(e.target);
                 if ($target.is(allowedSelector) || $target.closest(allowedSelector).length) {
-                    return true;
+                    return;
                 }
                 e.preventDefault();
-                return false;
+            });
+            $(document).on('selectstart', '.zonatech-container', function(e) {
+                const $target = $(e.target);
+                if ($target.is(allowedSelector) || $target.closest(allowedSelector).length) {
+                    return;
+                }
+                e.preventDefault();
             });
         },
         
