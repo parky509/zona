@@ -63,7 +63,7 @@ self.addEventListener('fetch', (event) => {
                 if (event.request.mode === 'navigate') {
                     return caches.match(OFFLINE_URL);
                 }
-                return new Response('', { status: 504, statusText: 'Gateway Timeout' });
+                return new Response('', { status: 503, statusText: 'Service Unavailable' });
             })
         );
         return;
