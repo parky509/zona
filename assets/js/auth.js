@@ -60,11 +60,6 @@
                     data: data,
                     dataType: 'json',
                     success: function(response) {
-                        const handleLoginError = (message) => {
-                            form.removeData('nonce-retry');
-                            showNotification(message || 'Login failed. Please try again.', 'error');
-                            submitBtn.prop('disabled', false).html(originalText);
-                        };
                         if (response.success) {
                             form.removeData('nonce-retry');
                             showNotification(response.data.message, 'success');
@@ -97,11 +92,6 @@
                     error: function(xhr, status, error) {
                         console.error('Login error:', status, error);
                         let errorMessage = 'An error occurred. Please try again.';
-                        const handleLoginError = (message) => {
-                            form.removeData('nonce-retry');
-                            showNotification(message || 'Login failed. Please try again.', 'error');
-                            submitBtn.prop('disabled', false).html(originalText);
-                        };
                         if (xhr.responseText) {
                             try {
                                 const response = JSON.parse(xhr.responseText);
@@ -152,6 +142,12 @@
                 const originalText = submitBtn.html();
                 const nonceRetry = form.data('nonce-retry') === true;
                 
+                const handleLoginError = (message) => {
+                    form.removeData('nonce-retry');
+                    showNotification(message || 'Login failed. Please try again.', 'error');
+                    submitBtn.prop('disabled', false).html(originalText);
+                };
+
                 // Basic validation
                 const password = form.find('[name="password"]').val();
                 const confirmPassword = form.find('[name="confirm_password"]').val();
@@ -189,11 +185,11 @@
                             const errorCode = response.data && response.data.code ? response.data.code : '';
                             if (errorCode === 'nonce_invalid') {
                                 const handleRegisterError = () => {
+                                    form.removeData('nonce-retry');
                                     showNotification(response.data.message, 'error');
                                     submitBtn.prop('disabled', false).html(originalText);
                                 };
                                 if (nonceRetry) {
-                                    form.removeData('nonce-retry');
                                     handleRegisterError();
                                     return;
                                 }
