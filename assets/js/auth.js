@@ -206,9 +206,7 @@
                                 });
                                 return;
                             }
-                            form.removeData('nonce-retry');
-                            showNotification(response.data.message, 'error');
-                            submitBtn.prop('disabled', false).html(originalText);
+                            handleRegisterError(response.data.message);
                         }
                     },
                     error: function(xhr) {
@@ -225,14 +223,9 @@
                                 console.warn('Failed to parse error response:', parseError);
                             }
                         }
-                        const handleRegisterError = () => {
-                            showNotification(errorMsg, 'error');
-                            submitBtn.prop('disabled', false).html(originalText);
-                        };
                         if (errorCode === 'nonce_invalid') {
                             if (nonceRetry) {
-                                form.removeData('nonce-retry');
-                                handleRegisterError();
+                                handleRegisterError(errorMsg);
                                 return;
                             }
                             ZonaTechAuth.refreshNonce().done(function(result) {
@@ -242,15 +235,13 @@
                                     form.trigger('submit');
                                     return;
                                 }
-                                handleRegisterError();
+                                handleRegisterError(errorMsg);
                             }).fail(function() {
-                                handleRegisterError();
+                                handleRegisterError(errorMsg);
                             });
                             return;
                         }
-                        form.removeData('nonce-retry');
-                        showNotification(errorMsg, 'error');
-                        submitBtn.prop('disabled', false).html(originalText);
+                        handleRegisterError(errorMsg);
                     }
                 });
             });
