@@ -43,6 +43,11 @@
                 const submitBtn = form.find('button[type="submit"]');
                 const originalText = submitBtn.html();
                 const nonceRetry = form.data('nonce-retry') === true;
+                const handleLoginError = (message) => {
+                    form.removeData('nonce-retry');
+                    showNotification(message || 'Login failed. Please try again.', 'error');
+                    submitBtn.prop('disabled', false).html(originalText);
+                };
                 
                 submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Logging in...');
                 
