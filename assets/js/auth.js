@@ -142,9 +142,9 @@
                 const originalText = submitBtn.html();
                 const nonceRetry = form.data('nonce-retry') === true;
                 
-                const handleLoginError = (message) => {
+                const handleRegisterError = (message) => {
                     form.removeData('nonce-retry');
-                    showNotification(message || 'Login failed. Please try again.', 'error');
+                    showNotification(message || 'Registration failed. Please try again.', 'error');
                     submitBtn.prop('disabled', false).html(originalText);
                 };
 
@@ -184,13 +184,8 @@
                         } else {
                             const errorCode = response.data && response.data.code ? response.data.code : '';
                             if (errorCode === 'nonce_invalid') {
-                                const handleRegisterError = () => {
-                                    form.removeData('nonce-retry');
-                                    showNotification(response.data.message, 'error');
-                                    submitBtn.prop('disabled', false).html(originalText);
-                                };
                                 if (nonceRetry) {
-                                    handleRegisterError();
+                                    handleRegisterError(response.data.message);
                                     return;
                                 }
                                 ZonaTechAuth.refreshNonce().done(function(result) {
@@ -200,9 +195,9 @@
                                         form.trigger('submit');
                                         return;
                                     }
-                                    handleRegisterError();
+                                    handleRegisterError(response.data.message);
                                 }).fail(function() {
-                                    handleRegisterError();
+                                    handleRegisterError(response.data.message);
                                 });
                                 return;
                             }
