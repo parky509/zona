@@ -60,6 +60,11 @@
                     data: data,
                     dataType: 'json',
                     success: function(response) {
+                        const handleLoginError = (message) => {
+                            form.removeData('nonce-retry');
+                            showNotification(message || 'Login failed. Please try again.', 'error');
+                            submitBtn.prop('disabled', false).html(originalText);
+                        };
                         if (response.success) {
                             form.removeData('nonce-retry');
                             showNotification(response.data.message, 'success');
@@ -70,9 +75,7 @@
                             const errorCode = response.data && response.data.code ? response.data.code : '';
                             if (errorCode === 'nonce_invalid') {
                                 if (nonceRetry) {
-                                    form.removeData('nonce-retry');
-                                    showNotification(response.data.message, 'error');
-                                    submitBtn.prop('disabled', false).html(originalText);
+                                    handleLoginError(response.data.message);
                                     return;
                                 }
                                 ZonaTechAuth.refreshNonce().done(function(result) {
@@ -82,24 +85,23 @@
                                         form.trigger('submit');
                                         return;
                                     }
-                                    form.removeData('nonce-retry');
-                                    showNotification(response.data.message, 'error');
-                                    submitBtn.prop('disabled', false).html(originalText);
+                                    handleLoginError(response.data.message);
                                 }).fail(function() {
-                                    form.removeData('nonce-retry');
-                                    showNotification(response.data.message, 'error');
-                                    submitBtn.prop('disabled', false).html(originalText);
+                                    handleLoginError(response.data.message);
                                 });
                                 return;
                             }
-                            form.removeData('nonce-retry');
-                            showNotification(response.data.message || 'Login failed. Please try again.', 'error');
-                            submitBtn.prop('disabled', false).html(originalText);
+                            handleLoginError(response.data.message);
                         }
                     },
                     error: function(xhr, status, error) {
                         console.error('Login error:', status, error);
                         let errorMessage = 'An error occurred. Please try again.';
+                        const handleLoginError = (message) => {
+                            form.removeData('nonce-retry');
+                            showNotification(message || 'Login failed. Please try again.', 'error');
+                            submitBtn.prop('disabled', false).html(originalText);
+                        };
                         if (xhr.responseText) {
                             try {
                                 const response = JSON.parse(xhr.responseText);
@@ -108,9 +110,7 @@
                                     const errorCode = response.data.code || '';
                                     if (errorCode === 'nonce_invalid') {
                                         if (nonceRetry) {
-                                            form.removeData('nonce-retry');
-                                            showNotification(errorMessage, 'error');
-                                            submitBtn.prop('disabled', false).html(originalText);
+                                            handleLoginError(errorMessage);
                                             return;
                                         }
                                         ZonaTechAuth.refreshNonce().done(function(result) {
@@ -119,9 +119,7 @@
                                                 form.data('nonce-retry', true);
                                                 form.trigger('submit');
                                             } else {
-                                                form.removeData('nonce-retry');
-                                                showNotification(errorMessage, 'error');
-                                                submitBtn.prop('disabled', false).html(originalText);
+                                                handleLoginError(errorMessage);
                                             }
                                         }).fail(function() {
                                             const fallback = window.location && window.location.href ? window.location.href : '';
@@ -129,9 +127,7 @@
                                                 window.location.href = fallback;
                                                 return;
                                             }
-                                            form.removeData('nonce-retry');
-                                            showNotification(errorMessage, 'error');
-                                            submitBtn.prop('disabled', false).html(originalText);
+                                            handleLoginError(errorMessage);
                                         });
                                         return;
                                     }
@@ -140,9 +136,7 @@
                                 console.warn('Failed to parse error response:', parseError);
                             }
                         }
-                        form.removeData('nonce-retry');
-                        showNotification(errorMessage, 'error');
-                        submitBtn.prop('disabled', false).html(originalText);
+                        handleLoginError(errorMessage);
                     }
                 });
             });
