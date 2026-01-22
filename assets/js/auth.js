@@ -67,6 +67,31 @@
                                 window.location.href = response.data.redirect;
                             }, 1000);
                         } else {
+                            const errorCode = response.data && response.data.code ? response.data.code : '';
+                            if (errorCode === 'nonce_invalid') {
+                                if (nonceRetry) {
+                                    form.removeData('nonce-retry');
+                                    showNotification(response.data.message, 'error');
+                                    submitBtn.prop('disabled', false).html(originalText);
+                                    return;
+                                }
+                                ZonaTechAuth.refreshNonce().done(function(result) {
+                                    if (result && result.data && result.data.nonce) {
+                                        zonatech_ajax.nonce = result.data.nonce;
+                                        form.data('nonce-retry', true);
+                                        form.trigger('submit');
+                                        return;
+                                    }
+                                    form.removeData('nonce-retry');
+                                    showNotification(response.data.message, 'error');
+                                    submitBtn.prop('disabled', false).html(originalText);
+                                }).fail(function() {
+                                    form.removeData('nonce-retry');
+                                    showNotification(response.data.message, 'error');
+                                    submitBtn.prop('disabled', false).html(originalText);
+                                });
+                                return;
+                            }
                             form.removeData('nonce-retry');
                             showNotification(response.data.message || 'Login failed. Please try again.', 'error');
                             submitBtn.prop('disabled', false).html(originalText);
@@ -167,6 +192,30 @@
                                 window.location.href = response.data.redirect;
                             }, 1000);
                         } else {
+                            const errorCode = response.data && response.data.code ? response.data.code : '';
+                            if (errorCode === 'nonce_invalid') {
+                                const handleRegisterError = () => {
+                                    showNotification(response.data.message, 'error');
+                                    submitBtn.prop('disabled', false).html(originalText);
+                                };
+                                if (nonceRetry) {
+                                    form.removeData('nonce-retry');
+                                    handleRegisterError();
+                                    return;
+                                }
+                                ZonaTechAuth.refreshNonce().done(function(result) {
+                                    if (result && result.data && result.data.nonce) {
+                                        zonatech_ajax.nonce = result.data.nonce;
+                                        form.data('nonce-retry', true);
+                                        form.trigger('submit');
+                                        return;
+                                    }
+                                    handleRegisterError();
+                                }).fail(function() {
+                                    handleRegisterError();
+                                });
+                                return;
+                            }
                             form.removeData('nonce-retry');
                             showNotification(response.data.message, 'error');
                             submitBtn.prop('disabled', false).html(originalText);
